@@ -116,7 +116,7 @@
                     <p style="padding: 0 32px 0 32px">This is the most recent query in the chain. {{ .Description }} Previous queries are displayed below in chronological order.</p>
                     <div class="divider"></div>
                     <p><em>Continue chain</em></p>
-                    <form action="/plugin/chain" method="post" accept-charset="UTF-8" style="width: 100%; display: contents;">
+                    <form action="/plugin/tonic" method="post" accept-charset="UTF-8" style="width: 100%; display: contents;">
                         <input type="hidden" name="lang" value="{{ $lang }}">
                         <input type="hidden" class="query" value="{{ .RawQuery }}">
                         {{ template "select_transformation" }}
@@ -191,7 +191,7 @@
                                     <pre>{{ $link.Query }}</pre>
                                 </div>
                                 <div class="modal-footer" style="text-align: left;">
-                                    <form action="/plugin/chain" method="post" accept-charset="UTF-8" style="width: 100%;">
+                                    <form action="/plugin/tonic" method="post" accept-charset="UTF-8" style="width: 100%;">
                                         {{ template "select_transformation" }}
                                         {{ template "select_optimisation" }}
                                         <input type="hidden" name="query" class="query" value="{{ $link.Query }}">
@@ -242,7 +242,7 @@
             <div class="panel-title"><h4>New Query</h4></div>
         </div>
         <div class="panel-body">
-            <form action="/plugin/chain" method="post" accept-charset="UTF-8">
+            <form action="/plugin/tonic" method="post" accept-charset="UTF-8">
                 <div class="form-group">
                     <textarea class="form-input query" placeholder="Enter query here." name="query" rows="20"></textarea>
                 </div>
@@ -282,6 +282,7 @@
                     <b>This process is dependent on the complexity of the query and the transformations used to generate variations.</b>
                     The waiting page will automatically redirect back to this interface once the process has completed.
                 </p>
+                <img src="tonic/static/PeacockServant.png" alt="servant" width="240px" height="auto">
             </div>
         </div>
         <div class="panel-footer"></div>
@@ -461,31 +462,6 @@
             showMinorLabels: false,
         };
         new vis.Graph2d(eval_container, eval_items, eval_groups, eval_options);
-        {{/*let ret1 = document.getElementsByClassName("vis-graph-group0");*/}}
-        {{/*let ret2 = document.getElementsByClassName("vis-graph-group1");*/}}
-        {{/*let max = 2 * {{ len .Chain }};*/}}
-        // console.log(ret1, ret1.length)
-        // for (let i = 0; i < ret1.length; i++) {
-        //     console.log(i);
-        //     ret1[i].addEventListener("click", function () {
-        //         let v = i;
-        //         if (v >= max) {
-        //             v = v - max;
-        //         }
-        //         console.log(v, i, max);
-        //         // window.location = "#link-" + v;
-        //     })
-        // }
-        // for (let i = 0; i < ret2.length; i++) {
-        //     ret2[i].addEventListener("click", function () {
-        //         let v = i;
-        //         if (v >= max) {
-        //             v = v - max;
-        //         }
-        //         console.log(v, i, max);
-        //         // window.location = "#link-" + v;
-        //     })
-        // }
     </script>
     <script type="text/javascript">
         // individual graphs.

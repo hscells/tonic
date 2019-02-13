@@ -27,7 +27,7 @@ import (
 	"sync"
 )
 
-type ChainPlugin struct{}
+type TonicPlugin struct{}
 
 var (
 	quickumlsCache quickumlsrest.Cache
@@ -301,7 +301,7 @@ func transform(cq learning.CandidateQuery, selector learning.QueryChainCandidate
 	return nq, candidates, nil
 }
 
-func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
+func (TonicPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 	// Load cui2vec components.
 	if vector == nil || mapping == nil {
 		err := initiate()
@@ -346,7 +346,7 @@ func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 	if _, ok := c.GetPostForm("clear"); ok {
 		queries[u] = learning.CandidateQuery{}
 		chain[u] = []link{}
-		c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/index.html"), templating{Query: queries[u], Language: lang}))
+		c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/index.html"), templating{Query: queries[u], Language: lang}))
 		return
 	}
 
@@ -360,7 +360,7 @@ func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 	selector := learning.NewQuickRankQueryCandidateSelector(
 		searchrefiner.ServerConfiguration.Config.Options["QuickRank"].(string),
 		map[string]interface{}{
-			"model-in":    fmt.Sprintf("plugin/chain/%s", models[model]),
+			"model-in":    fmt.Sprintf("plugin/tonic/%s", models[model]),
 			"test-metric": "DCG",
 			"test-cutoff": 1,
 			"scores":      uuid.New().String(),
@@ -444,7 +444,7 @@ func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 			lang:                   lang,
 		}
 		work.start()
-		c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/queue.html"), nil))
+		c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/queue.html"), nil))
 		return
 	} else { // Otherwise, we can either get the results, or continue to wait until the request is fulfilled.
 		if response.done {
@@ -454,19 +454,19 @@ func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 				c.HTML(http.StatusInternalServerError, "error.html", searchrefiner.ErrorPage{Error: response.err.Error(), BackLink: "/plugin/chain"})
 				panic(response.err)
 			}
-			//c.Render(http.StatusAccepted, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/index.html"), templating{Query: queries[u], Language: lang, Chain: chain[u], Description: chain[u][len(chain[u])-1].Description, RawQuery: chain[u][len(chain[u])-1].Query, Error: response.err}))
+			//c.Render(http.StatusAccepted, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/index.html"), templating{Query: queries[u], Language: lang, Chain: chain[u], Description: chain[u][len(chain[u])-1].Description, RawQuery: chain[u][len(chain[u])-1].Query, Error: response.err}))
 			//return
 		} else if ok && !response.done {
 			log.Println("work has not been completed")
-			c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/queue.html"), nil))
+			c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/queue.html"), nil))
 			return
 		} else {
 			if len(chain[u]) > 0 {
 				log.Println("there is no work but a chain exists")
-				c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/index.html"), templating{Query: queries[u], Language: lang, Chain: chain[u], Description: chain[u][len(chain[u])-1].Description, RawQuery: chain[u][len(chain[u])-1].Query, Error: response.err}))
+				c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/index.html"), templating{Query: queries[u], Language: lang, Chain: chain[u], Description: chain[u][len(chain[u])-1].Description, RawQuery: chain[u][len(chain[u])-1].Query, Error: response.err}))
 			} else {
 				log.Println("there is no work and no query has been submitted")
-				c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/index.html"), templating{Language: lang, Error: response.err}))
+				c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/index.html"), templating{Language: lang, Error: response.err}))
 			}
 			return
 		}
@@ -482,7 +482,7 @@ func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 	}
 
 	// Respond to a regular request.
-	c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/chain/index.html"), templating{
+	c.Render(http.StatusOK, searchrefiner.RenderPlugin(searchrefiner.TemplatePlugin("plugin/tonic/index.html"), templating{
 		Query:       nq,
 		Language:    lang,
 		Chain:       chain[u],
@@ -493,18 +493,18 @@ func (ChainPlugin) Serve(s searchrefiner.Server, c *gin.Context) {
 	return
 }
 
-func (ChainPlugin) PermissionType() searchrefiner.PluginPermission {
+func (TonicPlugin) PermissionType() searchrefiner.PluginPermission {
 	return searchrefiner.PluginUser
 }
 
-func (ChainPlugin) Details() searchrefiner.PluginDetails {
+func (TonicPlugin) Details() searchrefiner.PluginDetails {
 	return searchrefiner.PluginDetails{
-		Title:       "Query Chain Transformer",
-		Description: "Refine Boolean queries with automatic query transformations.",
+		Title:       "Tonic",
+		Description: "Automatically generate query variations with query transformation chains.",
 		Author:      "ielab",
-		Version:     "15.Jan.2019",
-		ProjectURL:  "https://ielab.io/searchrefiner/",
+		Version:     "13.Feb.2019",
+		ProjectURL:  "https://github.com/hscells/tonic",
 	}
 }
 
-var Chain ChainPlugin
+var Tonic TonicPlugin
