@@ -127,8 +127,8 @@ func ret(q cqr.CommonQueryRepresentation, s searchrefiner.Server, u string) (map
 	results := d.Results(gq, "0")
 	return eval.Evaluate(
 		[]eval.Evaluator{
-			eval.PrecisionEvaluator,
-			eval.RecallEvaluator,
+			eval.Precision,
+			eval.Recall,
 			eval.F1Measure,
 			eval.F05Measure,
 			eval.F3Measure,
